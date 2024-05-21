@@ -1,0 +1,12 @@
+[package]
+name = "rr-peer"
+version = "0.1.0"
+edition = "2021"
+authors = ["Dave Grantham <dwg@linuxprogrammer.org>"]
+license = "Apache 2.0"
+
+[dependencies]
+libp2p = { version = "0.53.2", features = ["tokio", "identify", "quic", "request-response", "mdns", "macros", "cbor"] }
+serde = { version = "1.0.202", features = ["derive"] }
+tokio = { version = "1.37.0", features = ["full"] }
+tracing-subscriber = { version = "0.3.18", features = ["std", "env-filter"] }

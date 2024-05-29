@@ -87,17 +87,19 @@ async fn main() -> Result<(), Box<dyn Error>> {
         select! {
             Some(_) = timer.next() => {
                 let connected: Vec<PeerId> = swarm.connected_peers().cloned().collect();
-                println!("Greeting {} Peers!", connected.len());
-                for peer_id in &connected {
-                    match peers.get(peer_id) {
-                        Some(address) => {
-                            println!("Greeting: {peer_id}");
-                            swarm.behaviour_mut()
-                                .request_response
-                                .send_request(peer_id, GreetRequest { message: format!("Hello!!"), address: address.clone() });
-                        }
-                        None => {
-                            println!("Peer {peer_id} not in list of peers");
+                if !connected.is_empty() {
+                    println!("Greeting {} Peers!", connected.len());
+                    for peer_id in &connected {
+                        match peers.get(peer_id) {
+                            Some(address) => {
+                                println!("Greeting: {peer_id}");
+                                swarm.behaviour_mut()
+                                    .request_response
+                                    .send_request(peer_id, GreetRequest { message: format!("Hello!!"), address: address.clone() });
+                            }
+                            None => {
+                                println!("Peer {peer_id} not in list of peers");
+                            }
                         }
                     }
                 }

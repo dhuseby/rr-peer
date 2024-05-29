@@ -116,7 +116,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             .expect("peer connection closed?");
                         *my_addr = req.address;
 
-                        swarm.dial(address)?;
                     }
                     request_response::Message::Response { response, .. } => {
                         let resp: GreetResponse = response;
@@ -126,7 +125,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 }
                 SwarmEvent::Behaviour(BehaviourEvent::Identify(identify::Event::Received { peer_id, info })) => {
                     if peer_id != local_peer_id {
-                        if info.agent_version == AGENT_VERSION.to_string() {
+                        if info.protocol_version == PROTOCOL.to_string() {
                             println!("Peer {peer_id} speaks our protocol");
                         } else {
                             println!("{peer_id} doesn't speak our protocol");
@@ -154,6 +153,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         ConnectedPoint::Listener { send_back_addr, .. } => {
                             clients.insert(peer_id, send_back_addr.clone());
                             println!("Successfully received dial from {peer_id}: {send_back_addr}");
+
+                            println!("Dialing back...");
+                            swarm.dial(send_back_addr)?;
                         }
                     }
                 }

@@ -73,11 +73,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .build();
 
     if let Some(addr) = std::env::args().nth(1) {
-        let remote: Multiaddr = addr.parse()?;
-        swarm.dial(remote)?;
+        let addr = format!("/ip4/{}/udp/0/quic-v1", addr);
+        let listen: Multiaddr = addr.parse()?;
+        swarm.listen_on(listen)?;
+    } else {
+        swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
     }
-
-    swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
 
     // set up a timer to tick every 30 seconds
     let mut timer = interval(Duration::from_secs(5));

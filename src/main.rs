@@ -103,17 +103,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 let connected: Vec<PeerId> = swarm.connected_peers().cloned().collect();
                 if !connected.is_empty() {
                     for peer_id in &connected {
-                        if let Some(address) = in_peers.get(peer_id) {
-                            println!("IN Greeting: {peer_id}");
-                            swarm.behaviour_mut()
-                                .request_response
-                                .send_request(peer_id, GreetRequest { message: format!("In Hello!!"), address: address.clone() });
-                        }
                         if let Some(address) = out_peers.get(peer_id) {
-                            println!("OUT Greeting: {peer_id}");
+                            println!("Greeting: {peer_id}");
                             swarm.behaviour_mut()
                                 .request_response
-                                .send_request(peer_id, GreetRequest { message: format!("Out Hello!!"), address: address.clone() });
+                                .send_request(peer_id, GreetRequest { message: format!("Hello from {my_addr}!!"), address: address.clone() });
                         }
                     }
                 }
@@ -179,6 +173,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
                         // since they told us what address they see us at, we can add that as our
                         // external address
+                        println!("our external address is {}", req.address);
                         swarm.add_external_address(req.address);
                     }
                     request_response::Message::Response { response, .. } => {
@@ -188,14 +183,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
                         // since they told us what address they see us at, we can add that as our
                         // external address
+                        println!("our external address is {}", resp.address);
                         swarm.add_external_address(resp.address);
                     }
                 }
 
                 // Swarm Events
 
-                SwarmEvent::ConnectionClosed { peer_id, connection_id, .. } => {
-                    println!("connection to {peer_id}:{connection_id} closed");
+                SwarmEvent::ConnectionClosed { peer_id, .. } => {
+                    println!("connection to {peer_id} closed");
                     in_peers.remove(&peer_id);
                     out_peers.remove(&peer_id);
                 }

@@ -6,6 +6,7 @@ authors = ["Dave Grantham <dwg@linuxprogrammer.org>"]
 license = "Apache 2.0"
 
 [dependencies]
+futures = "0.3.30"
 libp2p = { version = "0.53.2", features = ["tokio", "identify", "quic", "request-response", "mdns", "macros", "cbor"] }
 serde = { version = "1.0.202", features = ["derive"] }
 tokio = { version = "1.37.0", features = ["full"] }

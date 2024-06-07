@@ -73,19 +73,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
 
-    // set up a timer to tick every 10 seconds
-    let mut timer = Box::pin(stream::unfold(interval(Duration::from_secs(10)), |mut interval| async {
-        interval.tick().await;
-        Some(((), interval))
-    }));
-
-    let mut peers = Box::pin(BTreeMap::<PeerId, Multiaddr>::default());
-    let mut clients = Box::pin(BTreeMap::<PeerId, Multiaddr>::default());
+    // set up a timer to tick every 30 seconds
+    let mut timer = interval(Duration::from_secs(5));
+    let mut seen = Box::pin(BTreeSet::default());
+    let mut peers = Box::pin(BTreeSet::default());
     let mut my_addr = Box::pin(Multiaddr::empty());
 
     loop {
         select! {
-            Some(_) = timer.next() => {
+            _ = timer.next() => {
                 let connected: Vec<PeerId> = swarm.connected_peers().cloned().collect();
                 if !connected.is_empty() {
                     println!("Greeting {} Peers!", connected.len());
